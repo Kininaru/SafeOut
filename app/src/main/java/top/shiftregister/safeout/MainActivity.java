@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,5 +59,18 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    public void pubTest(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setPositiveButton("确定", null);
+        if (Sync.pub("Message from mqtt on Android")) {
+            builder.setTitle("成功");
+            builder.setMessage("发送订阅内容成功！");
+        } else {
+            builder.setTitle("失败");
+            builder.setMessage("发送订阅内容失败！");
+        }
+        builder.show();
     }
 }

@@ -35,7 +35,7 @@ public class Sync extends Service {
 
         @Override
         public void messageArrived(String topic, MqttMessage message) {
-            println("Mqtt收到消息:");
+            print("Mqtt收到消息: ");
             println(message.toString());
         }
 
@@ -128,13 +128,16 @@ public class Sync extends Service {
         mContext.startService(new Intent(mContext, Sync.class));
     }
 
-    public static void pub(String message) {
+    // 发布订阅内容
+    public static boolean pub(String message) {
         int qos = 2;
         boolean retained = false;
         try {
-            client.publish(MqttData.pubTopic, message.getBytes(), qos, retained);
+            client.publish(MqttData.subTopic, message.getBytes(), qos, retained);
+            return true;
         } catch (MqttException e) {
             println("Mqtt发布消息错误! ");
+            return false;
         }
     }
 }
