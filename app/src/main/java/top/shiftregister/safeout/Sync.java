@@ -23,8 +23,15 @@ import static top.shiftregister.safeout.Tools.*;
 
 public class Sync extends Service {
     static MqttAndroidClient client;
-    private MqttConnectOptions connectOptions;
+    private static MqttConnectOptions connectOptions;
     String TAG = Sync.class.getSimpleName();
+
+    static Context mainActivityContext;
+
+    static void setMainActivityContext(Context c) {
+        mainActivityContext = c;
+    }
+
     MqttCallback mqttCallback = new MqttCallback() {
 
         @Override
@@ -37,6 +44,7 @@ public class Sync extends Service {
         public void messageArrived(String topic, MqttMessage message) {
             print("Mqtt收到消息: ");
             println(message.toString());
+            ((MainActivity) mainActivityContext).loadData(message.toString());
         }
 
         @Override
@@ -45,7 +53,7 @@ public class Sync extends Service {
         }
     };
 
-    private IMqttActionListener listener = new IMqttActionListener() {
+    static private IMqttActionListener listener = new IMqttActionListener() {
         @Override
         public void onSuccess(IMqttToken asyncActionToken) {
             try {
@@ -58,7 +66,6 @@ public class Sync extends Service {
         @Override
         public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
             println("IMqttActionListener: 连接失败");
-            doClientConnection();
         }
     };
 
@@ -130,10 +137,8 @@ public class Sync extends Service {
 
     // 发布订阅内容
     public static boolean pub(String message) {
-        int qos = 2;
-        boolean retained = false;
         try {
-            client.publish(MqttData.subTopic, message.getBytes(), qos, retained);
+            client.publish(MqttData.subTopic, message.getBytes(), 2, false);
             return true;
         } catch (MqttException e) {
             println("Mqtt发布消息错误! ");
